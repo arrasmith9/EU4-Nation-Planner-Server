@@ -19,8 +19,8 @@ app.use(express.json());
 app.use(cors())
 app.use(express.urlencoded({ extended: true }));
 
-app.post('/getdata', (req, res) => {
-    pool.query(`SELECT ${req.body.select} FROM ${req.body.table} ${req.body.filter ? `WHERE ${buildWhereClause(req.body.filter)}` : ''} ${getOrderBy(req.body.order_by)}`)
+app.get('/getdata', (req, res) => {
+    pool.query(`SELECT ${req.query.select} FROM ${req.query.table} ${req.query.filter ? `WHERE ${buildWhereClause(req.query.filter)}` : ''} ${getOrderBy(req.query.orderByField, req.query.orderByDirection)}`)
     .then((result) => {
         res.send(JSON.stringify(result.rows));
     });
@@ -127,11 +127,11 @@ function buildWhereClause(filter) {
     }
 }
 
-function getOrderBy(order_by) {
-    if (order_by === undefined) {
+function getOrderBy(orderByField, orderByDirection) {
+    if (orderByField === undefined) {
         return '';
     }
-    return `ORDER BY ${order_by.field} ${order_by.direction}`;
+    return `ORDER BY ${orderByField} ${orderByDirection}`;
 }
 
 function getInsertColumns(reqItem) {
